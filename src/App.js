@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React,{useEffect, useState} from 'react';
+import Axios from 'axios';
+import Info from './Info'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () =>{
+  const getWeather = async () => {
+    //https://developer.accuweather.com/apis
+    const url = "http://dataservice.accuweather.com/currentconditions/v1/39054_PC?apikey=jHoDGPmF8EMulC2gLWEEy23iEgVPk5ex&language=en-us&details=false";
+    
+    let response = await Axios.get(url);
+    const data = response['data'][0]['Temperature']['Imperial']['Value'];
+    
+    console.log('Response: ', response)
+    setWeather(data);
+  }
+
+  const [weather, setWeather] = useState([]);
+
+  useEffect(()=>{
+    getWeather();
+  }, []);
+
+  return <div>
+          <Info weather={weather}/>
+      </div>
 }
 
 export default App;
