@@ -14,8 +14,6 @@ const App = () =>{
   const APIKEY = Data['Key'];
 
   const getLocation = async () => {
-    console.log(APIKEY)
-    console.log('Zip: ',zip);
     const url = `http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey=${APIKEY}&q=${zip}`;
     let response = await Axios.get(url);
     let data =  response['data'][0];
@@ -24,11 +22,11 @@ const App = () =>{
   }
   
   const getWeather = async () => {
-    console.log('Key: ',key);
     //https://developer.accuweather.com/apis
     const url = `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${APIKEY}&language=en-us&details=false`;
     let response = await Axios.get(url);
     const data = response['data'][0]['Temperature']['Imperial']['Value'];
+    console.log(data);
     setWeather(data);
   }
 
@@ -39,7 +37,10 @@ const App = () =>{
   const getSearch = e =>{
     // prevent page reload on form submit
     e.preventDefault();
-    setZip(search);
+    if(search != '')
+    {
+      setZip(search);
+    }
   }
 
   const Load = async () => {
@@ -54,7 +55,7 @@ const App = () =>{
   return <div className="contianer">
 
             <div className='row'>
-              <div className='col-12'>
+              <div className='offset-2 col-8 text-center'>
                 <form onSubmit={getSearch}>
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Search Location by Zip</label>
@@ -64,7 +65,7 @@ const App = () =>{
                 </form>
               </div>
             </div>
-
+            <br/><br/><br/>
             <div className='row'>
               <div className='col-12 text-center'>
                 <Info weather={weather} city={city}/>
