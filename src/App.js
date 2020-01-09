@@ -1,7 +1,8 @@
 import React,{useEffect, useState} from 'react';
 import Axios from 'axios';
 import Info from './Info';
-import Data from './Keys'
+import Data from './Keys';
+import './App.css'
 // import SearchBar from './SearchBar/SearchBar'
 
 const App = () =>{
@@ -11,26 +12,8 @@ const App = () =>{
   const [zip, setZip] = useState('90001');
   const [key, setKey]= useState('37834_PC');
   const [city, setCity] = useState('');
+  const [icon, setIcon] = useState(1);
   const APIKEY = Data['Key'];
-
-  const getLocation = async () => {
-    console.log(APIKEY)
-    console.log('Zip: ',zip);
-    const url = `http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey=${APIKEY}&q=${zip}`;
-    let response = await Axios.get(url);
-    let data =  response['data'][0];
-    setCity(data.EnglishName);
-    setKey(data.Key);
-  }
-  
-  const getWeather = async () => {
-    console.log('Key: ',key);
-    //https://developer.accuweather.com/apis
-    const url = `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${APIKEY}&language=en-us&details=false`;
-    let response = await Axios.get(url);
-    const data = response['data'][0]['Temperature']['Imperial']['Value'];
-    setWeather(data);
-  }
 
   const updateSearch = e => {
     setSearch(e.target.value);
@@ -42,19 +25,37 @@ const App = () =>{
     setZip(search);
   }
 
-  const Load = async () => {
-    await getLocation();
-    await getWeather();
-  }
-  //this will be called everytime an object in the array is called. Since it is empty, it will only run on the initial load.
-  useEffect(()=>{
-    Load();
-  }, [zip]);
+  //this will be called every time an object in the array is called. Since it is empty, it will only run on the initial load.
+  useEffect( ()=>{
+    async function fetchData() {
+      try {
+        const url = `http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey=${APIKEY}&q=${zip}`;
+        let response = await Axios.get(url);
+        let data =  await response['data'][0];
+        setCity(await data.EnglishName);
+        setKey(await data.Key);
+  
+        const url2 = `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${APIKEY}&language=en-us&details=false`;
+        response = await Axios.get(url2);
+        data = await response['data'][0];
+        setWeather(await data.Temperature.Imperial.Value);
+        setIcon(await data.WeatherIcon);
+        
+      } catch (error) {
+        console.log(error);
+        setCity('Not Available');
+        setKey('Error')
+        setWeather('0');
+      }
+    };
+
+    fetchData();
+  }, [zip, key, APIKEY]);
 
   return <div className="contianer">
 
             <div className='row'>
-              <div className='col-12'>
+              <div className='col-8 offset-2 text-center'>
                 <form onSubmit={getSearch}>
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Search Location by Zip</label>
@@ -65,9 +66,9 @@ const App = () =>{
               </div>
             </div>
 
-            <div className='row'>
-              <div className='col-12 text-center'>
-                <Info weather={weather} city={city}/>
+            <div className='row pt-4'>
+              <div className='col-6 offset-3 text-center p-4'>
+                <Info weather={weather} city={city} icon={icon}/>
               </div>
             </div>
 
