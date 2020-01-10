@@ -7,7 +7,7 @@ const Info = ({weather, city, icon}) => {
     },[icon]);
     return (
         <div className="infoWrapper white p-4">
-            <h1>Weather</h1>
+            <h1>Current Weather</h1>
             <h2>{weather}&#8457;</h2>
             <img src={image} alt=""/>
             <h4>{city}</h4>
