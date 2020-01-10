@@ -4,7 +4,7 @@ import Info from './Info';
 import Forecast from './Forecast';
 import Data from './Keys';
 import './App.css'
-// import SearchBar from './SearchBar/SearchBar'
+import SearchBar from './SearchBar/SearchBar'
 
 const App = () =>{
   
@@ -24,7 +24,7 @@ const App = () =>{
   const getSearch = e =>{
     // prevent page reload on form submit
     e.preventDefault();
-    if(search != '')
+    if(search !== '')
     {
       setZip(search);
     }
@@ -67,24 +67,32 @@ const App = () =>{
   return <div className="contianer">
 
             <div className='row'>
-              <div className='col-8 offset-2 text-center'>
-                <form onSubmit={getSearch}>
-                    <div className="form-group">
-                        <label htmlFor="exampleInputEmail1">Search Location by Zip</label>
-                        <input type="text" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" value={search} onChange={updateSearch}></input>
-                    </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
-                </form>
-              </div>
+              <SearchBar 
+              getSearch={getSearch} 
+              search = {search}
+              updateSearch={updateSearch}/>
             </div>
 
             <div className='row pt-4'>
-              <div className='col-6 offset-3 text-center p-4'>
+              <div className='col-4 offset-4 text-center p-4'>
                 <Info weather={weather} city={city} icon={icon}/>
-                {forecasts.map( day => (
-                  <Forecast />
-                ))}
               </div>
+            </div>
+
+            <div className="row">
+              <div className="offset 1 col-1">
+                <br/>
+              </div>
+                {forecasts.map( (forecast, index) => (
+                  <Forecast 
+                    key={index}
+                    date={forecast.Date}
+                    min={forecast.Temperature.Minimum.Value}
+                    max={forecast.Temperature.Maximum.Value}
+                    icon={forecast.Day.Icon}
+                    iconPhrase={forecast.Day.IconPhrase}
+                  />
+                ))}
             </div>
 
         </div>
