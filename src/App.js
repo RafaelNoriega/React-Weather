@@ -1,6 +1,7 @@
 import React,{useEffect, useState} from 'react';
 import Axios from 'axios';
 import Info from './Info';
+import Forecast from './Forecast';
 import Data from './Keys';
 import './App.css'
 // import SearchBar from './SearchBar/SearchBar'
@@ -8,6 +9,7 @@ import './App.css'
 const App = () =>{
   
   const [weather, setWeather] = useState([]);
+  const [forecasts, setForecasts] = useState([]); 
   const [search, setSearch] = useState('');
   const [zip, setZip] = useState('90001');
   const [key, setKey]= useState('37834_PC');
@@ -43,6 +45,13 @@ const App = () =>{
         data = await response['data'][0];
         setWeather(await data.Temperature.Imperial.Value);
         setIcon(await data.WeatherIcon);
+
+        const url3 = `http://dataservice.accuweather.com/forecasts/v1/daily/5day/${key}?apikey=${APIKEY}&language=en-us&details=false`;
+        response = await Axios.get(url3);
+        data = await response['data'];
+        console.log(data.DailyForecasts)
+        setForecasts(await data.DailyForecasts);
+
         
       } catch (error) {
         console.log(error);
@@ -58,11 +67,7 @@ const App = () =>{
   return <div className="contianer">
 
             <div className='row'>
-<<<<<<< HEAD
-              <div className='offset-2 col-8 text-center'>
-=======
               <div className='col-8 offset-2 text-center'>
->>>>>>> e5097df762713f378f8fbe0ba8832b55aea16f44
                 <form onSubmit={getSearch}>
                     <div className="form-group">
                         <label htmlFor="exampleInputEmail1">Search Location by Zip</label>
@@ -72,17 +77,13 @@ const App = () =>{
                 </form>
               </div>
             </div>
-<<<<<<< HEAD
-            <br/><br/><br/>
-            <div className='row'>
-              <div className='col-12 text-center'>
-                <Info weather={weather} city={city}/>
-=======
 
             <div className='row pt-4'>
               <div className='col-6 offset-3 text-center p-4'>
                 <Info weather={weather} city={city} icon={icon}/>
->>>>>>> e5097df762713f378f8fbe0ba8832b55aea16f44
+                {forecasts.map( day => (
+                  <Forecast />
+                ))}
               </div>
             </div>
 
