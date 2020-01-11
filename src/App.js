@@ -30,7 +30,7 @@ const App = () =>{
     }
   }
 
-  //this will be called every time an object in the array is called. Since it is empty, it will only run on the initial load.
+  //Loading the Location. This useEffect() Will be called first.
   useEffect( ()=>{
     async function fetchData() {
       try {
@@ -39,32 +39,44 @@ const App = () =>{
         let data =  await response['data'][0];
         setCity(await data.EnglishName);
         setKey(await data.Key);
-  
-        const url2 = `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${APIKEY}&language=en-us&details=false`;
-        response = await Axios.get(url2);
-        data = await response['data'][0];
-        setWeather(await data.Temperature.Imperial.Value);
-        setIcon(await data.WeatherIcon);
-
-        const url3 = `http://dataservice.accuweather.com/forecasts/v1/daily/5day/${key}?apikey=${APIKEY}&language=en-us&details=false`;
-        response = await Axios.get(url3);
-        data = await response['data'];
-        console.log(data.DailyForecasts)
-        setForecasts(await data.DailyForecasts);
-
-        
       } catch (error) {
         console.log(error);
-        setCity('Not Available');
-        setKey('Error')
+        setCity('Not Currently Available');
         setWeather('0');
       }
     };
-
     fetchData();
   }, [zip, key, APIKEY]);
 
-  return <div className="contianer">
+  //Loading current weather. this will be called second
+  useEffect( () =>{
+    async function fetchData(){
+      try {
+        const url2 = `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${APIKEY}&language=en-us&details=false`;
+        let response = await Axios.get(url2);
+        const data = await response['data'][0];
+        setWeather(await data.Temperature.Imperial.Value);
+        setIcon(await data.WeatherIcon);
+      } catch (error) {
+        setKey('Error')
+      }
+    }
+    fetchData();
+  },[key,APIKEY])
+  
+  // loading forecast. this will load third
+  useEffect( () =>{
+    async function fetchData(){
+      const url3 = `http://dataservice.accuweather.com/forecasts/v1/daily/5day/${key}?apikey=${APIKEY}&language=en-us&details=false`;
+      let response = await Axios.get(url3);
+      const data = await response['data'];
+      console.log(data.DailyForecasts)
+      setForecasts(await data.DailyForecasts);
+    }
+    fetchData();
+  },[key,APIKEY])
+  
+  return <div className="contianer pb-5">
 
             <div className='row'>
               <SearchBar 
@@ -74,12 +86,18 @@ const App = () =>{
             </div>
 
             <div className='row pt-4'>
-              <div className='col-4 offset-4 text-center p-4'>
+              <div className='col-4 offset-4 text-center'>
                 <Info weather={weather} city={city} icon={icon}/>
               </div>
             </div>
 
-            <div className="row">
+            <br/><br/>
+            
+            <div className="row pb-5">
+              <div className="col-12 text-center text-white pt-1 pb-5">
+                <h2>Forecast</h2>
+                <hr className="hr"/>
+              </div>
               <div className="offset 1 col-1">
                 <br/>
               </div>
